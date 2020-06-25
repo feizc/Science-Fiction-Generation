@@ -1,2 +1,2 @@
-# Science-Fiction-Generation
-an implementation for science fiction generation based on GPT-2
+# Story-Generation
+an implementation for story generation based on GPT-2
