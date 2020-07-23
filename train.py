@@ -41,7 +41,7 @@ while True:
         previous_data = previous_data.to(device)
         
         model.zero_grad()
-        res, loss, acc = model(input_data, correct_data, future_data, previous_data)
+        res, loss, acc, acc2 = model(input_data, correct_data, future_data, previous_data, future_data, previous_data)
         loss_acm += loss.item()
         acc_acm += acc
 
