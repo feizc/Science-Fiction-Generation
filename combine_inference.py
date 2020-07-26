@@ -41,6 +41,7 @@ files = os.listdir(txt_path)
 sentences = []
 vecs = np.zeros((1, 768))
 
+start = time.time()
 print('begin to read database!')
 for txt_name in files:
     txt_p = os.path.join(txt_path, txt_name)
@@ -54,7 +55,8 @@ for txt_name in files:
     mat = mat.reshape(-1, 768)
     vecs = np.concatenate((vecs, mat), axis=0)
 vecs = vecs[1:]
-print('all data has been read. ')
+end_database = time.time()
+print('all data has been read. time: ', end_database - start)
 print('total sentence number: ', len(sentences), ', vector size: ', vecs.shape)
 
 # 当前需要查询的句子，可以是多个句子，list形式
@@ -85,21 +87,25 @@ for j in range(len(tokens)):
 tokens_tensor = torch.tensor(tokens).to(device)
 segments_tensors = torch.tensor(segments).to(device)
 input_masks_tensors = torch.tensor(input_masks).to(device)
-print('sentences have been split by tokenizer')
+
+end_split = time.time()
+print('sentences have been split by tokenizer, time: ', end_split - end_database)
 
 # 读取组合的模型CKPT
 model_path = './data/CKPT_C'
 big_model = model_init(model_path, device)
 print('big_model has been loaded')
 
+start_query = time.time()
 # 模型输出预测的句子表示 (1, 768)
 q_v = big_model.work(tokens_tensor, segments_tensors, input_masks_tensors).cpu().detach().numpy()
 
 # 和数据库中所有的句子做点乘后排序
 score = np.sum(q_v * vecs, axis=1) / np.linalg.norm(q_v, axis=1) / np.linalg.norm(vecs, axis=1)
 idx = np.argsort(score)[::-1]
-
+end_query = time.time()
 # 返回检索到的句子
+print('retrieval ended, time: ', end_query - start_query)
 print('current sentences: ', sentence_list)
 print('1:', sentences[idx[0]])
 print('2:', sentences[idx[1]])
